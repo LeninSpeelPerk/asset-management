@@ -1,0 +1,51 @@
+// scrappedAsset.jade
+
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Asset Management System
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap4.min.css")
+    link(rel="stylesheet", href="/styles/style.css")
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      .container
+        a.navbar-brand(href="#") Asset Management System
+
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href="/employees") Employee Master
+          li.nav-item
+            a.nav-link(href="/assets") Asset Master
+          li.nav-item
+            a.nav-link(href="/assetCategories") Asset Category Master
+          li.nav-item
+            a.nav-link(href="/stocks") Stock View
+          li.nav-item
+            a.nav-link(href="/issueAsset") Issue Asset
+          li.nav-item
+            a.nav-link(href="/returnAsset") Return Asset
+          li.nav-item
+            a.nav-link(href="/scrappedAsset") Scrap Asset
+          li.nav-item
+            a.nav-link(href="/assetHistory") Asset History
+
+    .container.mt-3
+      section#scrap-asset.mb-5
+        h2.mb-3 Scrap Asset
+
+        //- Scrap Asset Form
+        form#scrap-asset-form(action="/scrappedAsset", method="post")
+          .form-row
+            .form-group.col-md-6
+              label(for="assetId") Asset ID:
+              input#assetId.form-control(type="number", name="assetId", placeholder="Enter Asset ID", required)
+            .form-group.col-md-6
+              label(for="reason") Reason:
+              input#reason.form-control(type="text", name="reason", placeholder="Enter Reason", required)
+          button.btn.btn-primary(type="submit") Scrap
+
+    script(src="https://code.jquery.com/jquery-3.5.1.min.js")

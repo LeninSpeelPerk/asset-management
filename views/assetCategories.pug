@@ -1,0 +1,159 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Asset Management System
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap4.min.css")
+    link(rel="stylesheet", href="/styles/style.css")
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      .container
+        a.navbar-brand(href="#") Asset Management System
+
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href="/employees") Employee Master
+          li.nav-item
+            a.nav-link(href="/assets") Asset Master
+          li.nav-item
+            a.nav-link(href="/assetCategories") Asset Category Master
+          li.nav-item
+            a.nav-link(href="/stocks") Stock View
+          li.nav-item
+            a.nav-link(href="/issueAsset") Issue Asset
+          li.nav-item
+            a.nav-link(href="/returnAsset") Return Asset
+          li.nav-item
+            a.nav-link(href="/scrappedAsset") Scrap Asset
+          li.nav-item
+            a.nav-link(href="/assetHistory") Asset History
+
+    .container.mt-3
+
+
+    script(src="https://code.jquery.com/jquery-3.5.1.min.js")
+    script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
+    script.
+      $(document).ready(function() {
+        // Function to handle form submission for adding/editing asset categories
+        $('#categoryForm').submit(function(event) {
+          event.preventDefault();
+          var formData = $(this).serialize();
+          var url = $(this).attr('action');
+          var method = $(this).attr('method');
+          $.ajax({
+            url: url,
+            method: method,
+            data: formData,
+            success: function(response) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: response.message,
+                confirmButtonText: 'OK'
+              }).then((result) => {
+                location.reload(); // Reload the page after successful operation
+              });
+            },
+            error: function(error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.responseJSON.message,
+                confirmButtonText: 'OK'
+              });
+            }
+          });
+        });
+
+        // Function to delete an asset category
+        $('.deleteCategory').click(function() {
+          var categoryId = $(this).data('id');
+          Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: 'You want to delete this asset category',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                url: '/assetCategories/' + categoryId,
+                method: 'DELETE',
+                success: function(response) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    confirmButtonText: 'OK'
+                  }).then((result) => {
+                    location.reload(); // Reload the page after successful operation
+                  });
+                },
+                error: function(error) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.responseJSON.message,
+                    confirmButtonText: 'OK'
+                  });
+                }
+              });
+            }
+          });
+        });
+      });
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      .container
+        a.navbar-brand(href="#") Asset Category Management
+
+    .container.mt-3
+      h2.mb-3 Asset Category Management
+
+      //- Add/Edit Category Form
+      form#categoryForm(action="/assetCategories", method="POST")
+        .form-group
+          label(for="categoryName") Name:
+          input#categoryName.form-control(type="text", name="name", required)
+        button.btn.btn-primary(type="submit") Save
+
+      //- Asset Categories Table
+      table#categoryTable.table.table-striped.table-bordered(data-toggle="dataTable", width="100%", cellspacing="0")
+        thead
+          tr
+            th Name
+            th Actions
+        tbody
+          each category in categories
+            tr
+              td= category.name
+              td
+                button.btn.btn-primary.btn-sm(type="button", data-id=category.id, data-toggle="modal", data-target="#editCategoryModal") Edit
+                button.btn.btn-danger.btn-sm.deleteCategory(type="button", data-id=category.id) Delete
+
+    //- Edit Category Modal
+    .modal#editCategoryModal.fade(tabindex="-1", role="dialog", aria-labelledby="editCategoryModalLabel", aria-hidden="true")
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h5.modal-title#editCategoryModalLabel Edit Asset Category
+            button.close(type="button", data-dismiss="modal", aria-label="Close")
+              span(aria-hidden="true") &times;
+          .modal-body
+            form#editCategoryForm(action="", method="POST")
+              .form-group
+                label(for="editCategoryName") Name:
+                input#editCategoryName.form-control(type="text", name="name", required)
+          .modal-footer
+            button.btn.btn-secondary(type="button", data-dismiss="modal") Close
+            button.btn.btn-primary(type="submit") Save Changes
+
+    script(src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js")
+    script(src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js")

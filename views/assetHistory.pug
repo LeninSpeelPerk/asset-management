@@ -1,0 +1,129 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Asset Management System
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap4.min.css")
+    link(rel="stylesheet", href="/styles/style.css")
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      .container
+        a.navbar-brand(href="#") Asset Management System
+
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href="/employees") Employee Master
+          li.nav-item
+            a.nav-link(href="/assets") Asset Master
+          li.nav-item
+            a.nav-link(href="/assetCategories") Asset Category Master
+          li.nav-item
+            a.nav-link(href="/stocks") Stock View
+          li.nav-item
+            a.nav-link(href="/issueAsset") Issue Asset
+          li.nav-item
+            a.nav-link(href="/returnAsset") Return Asset
+          li.nav-item
+            a.nav-link(href="/scrappedAsset") Scrap Asset
+          li.nav-item
+            a.nav-link(href="/assetHistory") Asset History
+
+    .container.mt-3
+      section#asset-history.mb-5
+        h2.mb-3 Asset History
+
+        //- Asset History Table
+        .asset-history-table-container
+          table#asset-history-table.table.table-striped.table-bordered(data-toggle="dataTable", width="100%", cellspacing="0")
+            thead
+              tr
+                th Action
+                th Details
+                th Timestamp
+            tbody
+              //- Loop through asset history entries and populate table rows
+              each entry in assetHistory
+                tr
+                  td= entry.action
+                  td= entry.details
+                  td= entry.timestamp
+
+        //- Add Asset History Form
+        form#add-asset-history-form(action="/assetHistory", method="POST")
+          .form-row
+            .form-group.col-md-4
+              label(for="action") Action:
+              input#action.form-control(type="text", name="action", placeholder="Action", required)
+            .form-group.col-md-4
+              label(for="details") Details:
+              input#details.form-control(type="text", name="details", placeholder="Details", required)
+            .form-group.col-md-4
+              label(for="assetId") Asset ID:
+              input#assetId.form-control(type="number", name="assetId", placeholder="Asset ID", required)
+          button.btn.btn-primary(type="submit") Add Entry
+
+    script(src="https://code.jquery.com/jquery-3.5.1.min.js")
+    script(src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js")
+    script(src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    script.
+      $(document).ready(function() {
+        // DataTable initialization
+        $('#asset-history-table').DataTable();
+      })
+
+        $('#add-asset-history-form').submit(function(event) {
+        event.preventDefault();
+        var formData = {
+            action: $('#action').val(),
+            details: $('#details').val(),
+            assetId: $('#assetId').val()
+        };
+        
+        // Using SweetAlert to display a confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to add this asset history entry?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, add it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // If user confirms, make AJAX request to add asset history entry
+            $.ajax({
+                url: '/assetHistory',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                console.log("Asset history entry added successfully");
+                // Show success message with SweetAlert
+                Swal.fire(
+                    'Success!',
+                    'Asset history entry added successfully.',
+                    'success'
+                ).then(() => {
+                    // Reload the page or perform any other action
+                    location.reload();
+                });
+                },
+                error: function(error) {
+                console.error(error);
+                // Show error message with SweetAlert
+                Swal.fire(
+                    'Error!',
+                    'Failed to add asset history entry. Please try again later.',
+                    'error'
+                );
+                }
+            });
+            }
+        });
+        });
+
